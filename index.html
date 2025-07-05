@@ -103,9 +103,12 @@
 </head>
 <body class="antialiased bg-slate-50">
 
-    <div class="flex h-screen">
+    <div class="relative min-h-screen lg:flex">
+        <!-- Overlay for mobile -->
+        <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
+
         <!-- Sidebar -->
-        <aside class="w-64 flex-shrink-0 bg-gradient-to-b from-violet-600 to-indigo-700 p-4 flex flex-col justify-between">
+        <aside id="sidebar" class="w-64 flex-shrink-0 bg-gradient-to-b from-violet-600 to-indigo-700 p-4 flex flex-col justify-between fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out z-30">
             <div>
                 <!-- Logo -->
                 <div class="flex items-center mb-10">
@@ -152,207 +155,231 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-            <!-- Page: Beranda / Welcome -->
-            <div id="page-beranda" class="page-content">
-                <div class="container mx-auto max-w-4xl">
-                    <div class="bg-white p-8 sm:p-12 rounded-xl shadow-lg text-center">
-                        <h1 class="text-5xl font-extrabold gradient-text">Hai, Bestie! 👋</h1>
-                        <p class="text-lg text-gray-600 mt-6 leading-relaxed">
-                            Selamat datang di <strong>ThreadCEU AI</strong>. Biar bikin thread gak cuma wacana, di sini kamu bisa cari ide topik, nemuin gaya bahasa yang pas, sampai bikin konten kece yang bikin orang pengen baca sampai habis. Ceuceu AI siap bantu kamu nyusun kata demi kata, biar isi kontenmu makin ngena dan relate sama audience.
-                        </p>
-                        <p class="text-lg text-gray-600 mt-4 leading-relaxed">
-                            Gak cuma itu, kamu juga bisa dapet inspirasi hook yang bikin orang kepo dan betah scrolling timeline. Pokoknya, bikin thread sekarang jadi jauh lebih gampang, seru, dan fun. Ceuceu di sini siap jadi partner kamu biar konten makin cuan dan engagement naik terus!
-                        </p>
-                        <p class="text-lg text-gray-600 mt-4 leading-relaxed">
-                            Yuk, gas bareng Ceuceu AI! Dan kalau mau ngobrol santai, tukar ide, atau sekadar curhat soal struggle bikin konten, mampir aja ke <a href="https://t.me/ceuceuai" target="_blank" class="text-indigo-600 font-bold hover:underline">Telegram Ceuceu</a>. Santai aja, gak maksa kok. Ceuceu di sana selalu siap nemenin, bestie! 😉
-                        </p>
-                        <div class="mt-10">
-                            <button id="start-creating-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-lg shadow-lg transition-all duration-300 text-lg">
-                                Mulai Bikin Konten!
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Page: Thread Generator -->
-            <div id="page-generator" class="page-content hidden">
-                <div class="container mx-auto max-w-4xl">
-                    <header class="text-left mb-8">
-                        <h1 class="text-4xl font-extrabold gradient-text">Thread Generator</h1>
-                        <p class="text-lg text-gray-500 mt-2">Mulai buat thread viral Anda dengan mengisi form di bawah.</p>
-                    </header>
-
-                    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mb-8">
-                        <div class="divide-y divide-gray-200">
-                            <div class="py-6">
-                                <label for="tema" class="block text-sm font-semibold text-indigo-600 mb-2">1. Tema / Niche</label>
-                                <select id="tema" class="form-select w-full rounded-md">
-                                    <option>Pemasaran Digital</option>
-                                    <option>Teknologi & AI</option>
-                                    <option>Pengembangan Diri</option>
-                                    <option>Kesehatan & Kebugaran</option>
-                                    <option>Keuangan & Investasi</option>
-                                    <option>Startup & Bisnis</option>
-                                    <option value="custom">Lainnya (manual)...</option>
-                                </select>
-                                <input type="text" id="tema-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Masukkan niche Anda sendiri">
-                            </div>
-                            <div class="py-6">
-                                <label for="gaya" class="block text-sm font-semibold text-indigo-600 mb-2">2. Gaya Bahasa</label>
-                                <select id="gaya" class="form-select w-full rounded-md">
-                                    <option>Humoris</option>
-                                    <option>Formal</option>
-                                    <option>Edukasi</option>
-                                    <option>Profesional</option>
-                                    <option>Inspiratif</option>
-                                    <option value="custom">Lainnya (manual)...</option>
-                                </select>
-                                <input type="text" id="gaya-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Contoh: Seperti teman cerita">
-                            </div>
-                            <div class="py-6">
-                                <label for="topik-select" class="block text-sm font-semibold text-indigo-600 mb-2">3. Topik / Keyword</label>
-                                <select id="topik-select" class="form-select w-full rounded-md">
-                                    <option>Tips & Trik</option>
-                                    <option>Studi Kasus</option>
-                                    <option>Berita Terbaru</option>
-                                    <option value="custom">Lainnya (manual)...</option>
-                                </select>
-                                <input type="text" id="topik-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Masukkan topik spesifik Anda">
-                            </div>
-                            <div class="py-6">
-                                <label for="jenis" class="block text-sm font-semibold text-indigo-600 mb-2">4. Panjang Thread</label>
-                                <select id="jenis" class="form-select w-full rounded-md">
-                                    <option value="1 post">1 Post (Sangat Pendek)</option>
-                                    <option value="3-5 post" selected>3-5 post (Seri Pendek)</option>
-                                    <option value="6-9 post">6-9 post (Seri Medium)</option>
-                                    <option value="10-15 post">10-15 post (Seri Panjang)</option>
-                                </select>
-                            </div>
-                            <div class="py-6">
-                                <label class="block text-sm font-semibold text-indigo-600">5. Rekomendasi Gambar</label>
-                                <fieldset class="mt-2">
-                                    <div class="flex items-center space-x-6">
-                                        <div class="flex items-center"><input id="gambar-ya" name="rekomendasi-gambar" type="radio" value="ya" checked class="form-radio h-4 w-4"><label for="gambar-ya" class="ml-2 block text-sm text-gray-700">Ya</label></div>
-                                        <div class="flex items-center"><input id="gambar-tidak" name="rekomendasi-gambar" type="radio" value="tidak" class="form-radio h-4 w-4"><label for="gambar-tidak" class="ml-2 block text-sm text-gray-700">Tidak</label></div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="py-6">
-                                <label for="cta-select" class="block text-sm font-semibold text-indigo-600 mb-2">6. Pilih CTA (Call to Action)</label>
-                                <select id="cta-select" class="form-select w-full rounded-md">
-                                    <option>Ajak komen</option>
-                                    <option>Ajak save / share</option>
-                                    <option>Ajak follow</option>
-                                    <option>Tidak perlu</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mt-8 text-center"><button id="generate-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all duration-300 w-full sm:w-auto">✨ Generate Konten</button></div>
-                    </div>
-                    <div id="output-section" class="hidden">
-                         <div id="loader" class="flex justify-center items-center my-8 hidden"><div class="loader"></div><p class="ml-4 text-gray-500">AI sedang meracik konten...</p></div>
-                        <div id="results" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <div>
-                                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center"><svg class="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span>1. Hasil Konten Thread</span></h2>
-                                <div id="thread-output" class="output-box"><p class="text-gray-400">Hasil konten thread akan muncul di sini...</p></div>
-                                <div class="mt-4 flex space-x-2"><button id="copy-thread-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Salin</button><button id="save-thread-txt-btn" class="flex-1 bg-indigo-200 hover:bg-indigo-300 text-indigo-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan .TXT</button></div>
-                            </div>
-                            <div id="prompt-output-container">
-                                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center"><svg class="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span>2. Hasil Prompt Visual</span></h2>
-                                <div id="prompt-output" class="output-box"><p class="text-gray-400">Prompt untuk AI Image akan muncul di sini...</p></div>
-                                <div class="mt-4 flex space-x-2"><button id="copy-prompt-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Salin</button><button id="save-prompt-txt-btn" class="flex-1 bg-indigo-200 hover:bg-indigo-300 text-indigo-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan .TXT</button></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Page: Inspirasi Hook -->
-            <div id="page-hook" class="page-content hidden">
-                 <div class="container mx-auto max-w-4xl">
-                    <header class="text-left mb-8">
-                        <h1 class="text-4xl font-extrabold gradient-text">Inspirasi Hook</h1>
-                        <p class="text-lg text-gray-500 mt-2">Dapatkan 20 ide hook (kalimat pembuka) terbaik untuk konten Anda.</p>
-                    </header>
-
-                     <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mb-8">
-                        <div class="space-y-6">
-                            <div>
-                                <label for="hook-tema-select" class="block text-sm font-semibold text-indigo-600 mb-2">Pilih Tema Hook</label>
-                                <select id="hook-tema-select" class="form-select w-full rounded-md">
-                                    <option>Galau</option>
-                                    <option>Humor</option>
-                                    <option>Data/Fakta</option>
-                                    <option>Pop Culture</option>
-                                    <option value="custom">Lainnya (manual)...</option>
-                                </select>
-                                <input type="text" id="hook-tema-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Masukkan tema hook Anda sendiri">
-                            </div>
-                        </div>
-                        <div class="mt-8 text-center"><button id="generate-hook-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all duration-300 w-full sm:w-auto">🚀 Generate 20 Hook</button></div>
-                    </div>
-
-                    <div id="hook-output-section" class="hidden">
-                         <div id="hook-loader" class="flex justify-center items-center my-8 hidden"><div class="loader"></div><p class="ml-4 text-gray-500">AI sedang mencari inspirasi...</p></div>
-                        <div id="hook-results">
-                            <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center"><svg class="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span>20 Hook Terbaik Untukmu</span></h2>
-                            <div id="hook-output" class="output-box"><p class="text-gray-400">Daftar hook akan muncul di sini...</p></div>
-                            <div class="mt-4 flex space-x-2"><button id="copy-hook-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Salin</button><button id="save-hook-txt-btn" class="flex-1 bg-indigo-200 hover:bg-indigo-300 text-indigo-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan .TXT</button></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="flex-1 flex flex-col">
+            <!-- Mobile Header -->
+            <header class="lg:hidden flex items-center justify-between p-4 bg-white shadow-md">
+                <button id="mobile-menu-btn" class="text-gray-600 hover:text-indigo-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <h1 id="mobile-header-title" class="text-lg font-bold gradient-text">Beranda</h1>
+            </header>
             
-            <!-- Page: Pengaturan -->
-            <div id="page-pengaturan" class="page-content hidden">
-                <div class="container mx-auto max-w-4xl">
-                    <header class="text-left mb-8">
-                        <h1 class="text-4xl font-extrabold gradient-text">Pengaturan & API Key</h1>
-                        <p class="text-lg text-gray-500 mt-2">Gunakan API Key pribadi Anda untuk penggunaan tanpa batas.</p>
-                    </header>
-                    
-                    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mb-8 space-y-8 guide-section">
-                        <!-- Bagian Input API Key -->
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-800">Opsi Lanjutan: Gunakan API Key Pribadi (Opsional)</h2>
-                            <p class="mt-2 text-gray-600">Aplikasi ini dapat digunakan secara gratis menggunakan API Key default. Namun, jika Anda mengalami error karena penggunaan yang tinggi atau ingin performa yang lebih stabil, Anda memiliki opsi untuk menggunakan API Key Google Gemini pribadi Anda.</p>
-                            <div class="mt-4">
-                                <label for="api-key-input" class="block text-sm font-semibold text-indigo-600 mb-2">Google Gemini API Key</label>
-                                <input type="password" id="api-key-input" class="form-input w-full rounded-md" placeholder="Masukkan API Key Anda (diawali dengan AIza...)">
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+                <!-- Page: Beranda / Welcome -->
+                <div id="page-beranda" class="page-content">
+                    <div class="container mx-auto max-w-4xl">
+                        <div class="bg-white p-8 sm:p-12 rounded-xl shadow-lg text-center">
+                            <h1 class="text-5xl font-extrabold gradient-text">Hai, Bestie! 👋</h1>
+                            <p class="text-lg text-gray-600 mt-6 leading-relaxed">
+                                Selamat datang di <strong>ThreadCEU AI</strong>. Biar bikin thread gak cuma wacana, di sini kamu bisa cari ide topik, nemuin gaya bahasa yang pas, sampai bikin konten kece yang bikin orang pengen baca sampai habis. Ceuceu AI siap bantu kamu nyusun kata demi kata, biar isi kontenmu makin ngena dan relate sama audience.
+                            </p>
+                            <p class="text-lg text-gray-600 mt-4 leading-relaxed">
+                                Gak cuma itu, kamu juga bisa dapet inspirasi hook yang bikin orang kepo dan betah scrolling timeline. Pokoknya, bikin thread sekarang jadi jauh lebih gampang, seru, dan fun. Ceuceu di sini siap jadi partner kamu biar konten makin cuan dan engagement naik terus!
+                            </p>
+                            <p class="text-lg text-gray-600 mt-4 leading-relaxed">
+                                Yuk, gas bareng Ceuceu AI! Dan kalau mau ngobrol santai, tukar ide, atau sekadar curhat soal struggle bikin konten, mampir aja ke <a href="https://t.me/ceuceuai" target="_blank" class="text-indigo-600 font-bold hover:underline">Telegram Ceuceu</a>. Santai aja, gak maksa kok. Ceuceu di sana selalu siap nemenin, bestie! 😉
+                            </p>
+                            <div class="mt-10">
+                                <button id="start-creating-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-lg shadow-lg transition-all duration-300 text-lg">
+                                    Mulai Bikin Konten!
+                                </button>
                             </div>
-                            <div class="mt-4 flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <button id="save-api-key-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan Kunci</button>
-                                    <button id="remove-api-key-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">Hapus Kunci</button>
-                                </div>
-                                <span id="api-key-status" class="text-sm font-medium"></span>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-gray-200 pt-8">
-                            <h2 class="text-2xl font-bold text-gray-800">Cara Mendapatkan API Key Google Gemini (Gratis)</h2>
-                            <p class="mt-2 text-gray-600">Aplikasi ini secara default menggunakan Google Gemini. Ini adalah pilihan yang direkomendasikan dan memiliki kuota gratis yang besar.</p>
-                            <ol class="mt-4">
-                                <li>Kunjungi situs <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-600 font-semibold hover:underline">Google AI Studio</a>.</li>
-                                <li>Login menggunakan Akun Google Anda.</li>
-                                <li>Klik tombol <strong>"Create API key in new project"</strong>.</li>
-                                <li>Sebuah popup akan muncul dengan API Key Anda. Salin (copy) key tersebut. Key Anda akan diawali dengan <code>AIza...</code>.</li>
-                                <li>Simpan key ini di tempat yang aman dan masukkan di kolom di atas.</li>
-                            </ol>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
+
+                <!-- Page: Thread Generator -->
+                <div id="page-generator" class="page-content hidden">
+                    <div class="container mx-auto max-w-4xl">
+                        <header class="text-left mb-8 hidden lg:block">
+                            <h1 class="text-4xl font-extrabold gradient-text">Thread Generator</h1>
+                            <p class="text-lg text-gray-500 mt-2">Mulai buat thread viral Anda dengan mengisi form di bawah.</p>
+                        </header>
+
+                        <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mb-8">
+                            <div class="divide-y divide-gray-200">
+                                <div class="py-6">
+                                    <label for="tema" class="block text-sm font-semibold text-indigo-600 mb-2">1. Tema / Niche</label>
+                                    <select id="tema" class="form-select w-full rounded-md">
+                                        <option>Pemasaran Digital</option>
+                                        <option>Teknologi & AI</option>
+                                        <option>Pengembangan Diri</option>
+                                        <option>Kesehatan & Kebugaran</option>
+                                        <option>Keuangan & Investasi</option>
+                                        <option>Startup & Bisnis</option>
+                                        <option value="custom">Lainnya (manual)...</option>
+                                    </select>
+                                    <input type="text" id="tema-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Masukkan niche Anda sendiri">
+                                </div>
+                                <div class="py-6">
+                                    <label for="gaya" class="block text-sm font-semibold text-indigo-600 mb-2">2. Gaya Bahasa</label>
+                                    <select id="gaya" class="form-select w-full rounded-md">
+                                        <option>Humoris</option>
+                                        <option>Formal</option>
+                                        <option>Edukasi</option>
+                                        <option>Profesional</option>
+                                        <option>Inspiratif</option>
+                                        <option value="custom">Lainnya (manual)...</option>
+                                    </select>
+                                    <input type="text" id="gaya-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Contoh: Seperti teman cerita">
+                                </div>
+                                <div class="py-6">
+                                    <label for="topik-select" class="block text-sm font-semibold text-indigo-600 mb-2">3. Topik / Keyword</label>
+                                    <select id="topik-select" class="form-select w-full rounded-md">
+                                        <option>Tips & Trik</option>
+                                        <option>Studi Kasus</option>
+                                        <option>Berita Terbaru</option>
+                                        <option value="custom">Lainnya (manual)...</option>
+                                    </select>
+                                    <input type="text" id="topik-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Masukkan topik spesifik Anda">
+                                </div>
+                                <div class="py-6">
+                                    <label for="jenis" class="block text-sm font-semibold text-indigo-600 mb-2">4. Panjang Thread</label>
+                                    <select id="jenis" class="form-select w-full rounded-md">
+                                        <option value="1 post">1 Post (Sangat Pendek)</option>
+                                        <option value="3-5 post" selected>3-5 post (Seri Pendek)</option>
+                                        <option value="6-9 post">6-9 post (Seri Medium)</option>
+                                        <option value="10-15 post">10-15 post (Seri Panjang)</option>
+                                    </select>
+                                </div>
+                                <div class="py-6">
+                                    <label class="block text-sm font-semibold text-indigo-600">5. Rekomendasi Gambar</label>
+                                    <fieldset class="mt-2">
+                                        <div class="flex items-center space-x-6">
+                                            <div class="flex items-center"><input id="gambar-ya" name="rekomendasi-gambar" type="radio" value="ya" checked class="form-radio h-4 w-4"><label for="gambar-ya" class="ml-2 block text-sm text-gray-700">Ya</label></div>
+                                            <div class="flex items-center"><input id="gambar-tidak" name="rekomendasi-gambar" type="radio" value="tidak" class="form-radio h-4 w-4"><label for="gambar-tidak" class="ml-2 block text-sm text-gray-700">Tidak</label></div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div class="py-6">
+                                    <label for="cta-select" class="block text-sm font-semibold text-indigo-600 mb-2">6. Pilih CTA (Call to Action)</label>
+                                    <select id="cta-select" class="form-select w-full rounded-md">
+                                        <option>Ajak komen</option>
+                                        <option>Ajak save / share</option>
+                                        <option>Ajak follow</option>
+                                        <option>Tidak perlu</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-8 text-center"><button id="generate-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all duration-300 w-full sm:w-auto">✨ Generate Konten</button></div>
+                        </div>
+                        <div id="output-section" class="hidden">
+                             <div id="loader" class="flex justify-center items-center my-8 hidden"><div class="loader"></div><p class="ml-4 text-gray-500">AI sedang meracik konten...</p></div>
+                            <div id="results" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div>
+                                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center"><svg class="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span>1. Hasil Konten Thread</span></h2>
+                                    <div id="thread-output" class="output-box"><p class="text-gray-400">Hasil konten thread akan muncul di sini...</p></div>
+                                    <div class="mt-4 flex space-x-2"><button id="copy-thread-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Salin</button><button id="save-thread-txt-btn" class="flex-1 bg-indigo-200 hover:bg-indigo-300 text-indigo-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan .TXT</button></div>
+                                </div>
+                                <div id="prompt-output-container">
+                                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center"><svg class="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span>2. Hasil Prompt Visual</span></h2>
+                                    <div id="prompt-output" class="output-box"><p class="text-gray-400">Prompt untuk AI Image akan muncul di sini...</p></div>
+                                    <div class="mt-4 flex space-x-2"><button id="copy-prompt-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Salin</button><button id="save-prompt-txt-btn" class="flex-1 bg-indigo-200 hover:bg-indigo-300 text-indigo-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan .TXT</button></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page: Inspirasi Hook -->
+                <div id="page-hook" class="page-content hidden">
+                     <div class="container mx-auto max-w-4xl">
+                        <header class="text-left mb-8 hidden lg:block">
+                            <h1 class="text-4xl font-extrabold gradient-text">Inspirasi Hook</h1>
+                            <p class="text-lg text-gray-500 mt-2">Dapatkan 20 ide hook (kalimat pembuka) terbaik untuk konten Anda.</p>
+                        </header>
+
+                         <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mb-8">
+                            <div class="space-y-6">
+                                <div>
+                                    <label for="hook-tema-select" class="block text-sm font-semibold text-indigo-600 mb-2">Pilih Tema Hook</label>
+                                    <select id="hook-tema-select" class="form-select w-full rounded-md">
+                                        <option>Galau</option>
+                                        <option>Humor</option>
+                                        <option>Data/Fakta</option>
+                                        <option>Pop Culture</option>
+                                        <option value="custom">Lainnya (manual)...</option>
+                                    </select>
+                                    <input type="text" id="hook-tema-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Masukkan tema hook Anda sendiri">
+                                </div>
+                            </div>
+                            <div class="mt-8 text-center"><button id="generate-hook-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all duration-300 w-full sm:w-auto">🚀 Generate 20 Hook</button></div>
+                        </div>
+
+                        <div id="hook-output-section" class="hidden">
+                             <div id="hook-loader" class="flex justify-center items-center my-8 hidden"><div class="loader"></div><p class="ml-4 text-gray-500">AI sedang mencari inspirasi...</p></div>
+                            <div id="hook-results">
+                                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center"><svg class="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span>20 Hook Terbaik Untukmu</span></h2>
+                                <div id="hook-output" class="output-box"><p class="text-gray-400">Daftar hook akan muncul di sini...</p></div>
+                                <div class="mt-4 flex space-x-2"><button id="copy-hook-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Salin</button><button id="save-hook-txt-btn" class="flex-1 bg-indigo-200 hover:bg-indigo-300 text-indigo-800 font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan .TXT</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Page: Pengaturan -->
+                <div id="page-pengaturan" class="page-content hidden">
+                    <div class="container mx-auto max-w-4xl">
+                        <header class="text-left mb-8 hidden lg:block">
+                            <h1 class="text-4xl font-extrabold gradient-text">Pengaturan & API Key</h1>
+                            <p class="text-lg text-gray-500 mt-2">Gunakan API Key pribadi Anda untuk penggunaan tanpa batas.</p>
+                        </header>
+                        
+                        <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mb-8 space-y-8 guide-section">
+                            <!-- Bagian Input API Key -->
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">Opsi Lanjutan: Gunakan API Key Pribadi (Opsional)</h2>
+                                <p class="mt-2 text-gray-600">Aplikasi ini dapat digunakan secara gratis menggunakan API Key default. Namun, jika Anda mengalami error karena penggunaan yang tinggi atau ingin performa yang lebih stabil, Anda memiliki opsi untuk menggunakan API Key Google Gemini pribadi Anda.</p>
+                                <div class="mt-4">
+                                    <label for="api-key-input" class="block text-sm font-semibold text-indigo-600 mb-2">Google Gemini API Key</label>
+                                    <input type="password" id="api-key-input" class="form-input w-full rounded-md" placeholder="Masukkan API Key Anda (diawali dengan AIza...)">
+                                </div>
+                                <div class="mt-4 flex items-center justify-between">
+                                    <div class="flex items-center space-x-4">
+                                        <button id="save-api-key-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan Kunci</button>
+                                        <button id="remove-api-key-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">Hapus Kunci</button>
+                                    </div>
+                                    <span id="api-key-status" class="text-sm font-medium"></span>
+                                </div>
+                            </div>
+
+                            <div class="border-t border-gray-200 pt-8">
+                                <h2 class="text-2xl font-bold text-gray-800">Cara Mendapatkan API Key Google Gemini (Gratis)</h2>
+                                <p class="mt-2 text-gray-600">Aplikasi ini secara default menggunakan Google Gemini. Ini adalah pilihan yang direkomendasikan dan memiliki kuota gratis yang besar.</p>
+                                <ol class="mt-4">
+                                    <li>Kunjungi situs <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-600 font-semibold hover:underline">Google AI Studio</a>.</li>
+                                    <li>Login menggunakan Akun Google Anda.</li>
+                                    <li>Klik tombol <strong>"Create API key in new project"</strong>.</li>
+                                    <li>Sebuah popup akan muncul dengan API Key Anda. Salin (copy) key tersebut. Key Anda akan diawali dengan <code>AIza...</code>.</li>
+                                    <li>Simpan key ini di tempat yang aman dan masukkan di kolom di atas.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script>
-        // --- PAGE NAVIGATION ---
+        // --- PAGE & MOBILE NAVIGATION ---
+        const sidebar = document.getElementById('sidebar');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const overlay = document.getElementById('overlay');
         const navLinks = document.querySelectorAll('.sidebar-link');
         const pages = document.querySelectorAll('.page-content');
         const startCreatingBtn = document.getElementById('start-creating-btn');
+        const mobileHeaderTitle = document.getElementById('mobile-header-title');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
 
         function navigateTo(pageId) {
             const targetLink = document.getElementById(`nav-${pageId}`);
@@ -362,14 +389,16 @@
             targetLink.classList.add('active');
 
             pages.forEach(page => {
-                if (page.id === `page-${pageId}`) {
-                    page.classList.remove('hidden');
-                } else {
-                    page.classList.add('hidden');
-                }
+                page.classList.toggle('hidden', page.id !== `page-${pageId}`);
             });
+            
+            mobileHeaderTitle.textContent = targetLink.querySelector('span').textContent;
+            closeSidebar();
         }
 
+        mobileMenuBtn.addEventListener('click', openSidebar);
+        overlay.addEventListener('click', closeSidebar);
+        
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const pageId = link.id.split('-')[1];
