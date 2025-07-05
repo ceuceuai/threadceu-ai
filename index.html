@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThreadCEU AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+            color: #e5e7eb;
+        }
+        .form-select, .form-input, .form-radio {
+            background-color: #1f2937; /* bg-gray-800 */
+            border-color: #4b5563; /* border-gray-600 */
+            color: #e5e7eb;
+        }
+        .form-select:focus, .form-input:focus, .form-radio:focus {
+            outline: none;
+            border-color: #4f46e5; /* border-indigo-600 */
+            box-shadow: 0 0 0 2px #4338ca; /* ring-indigo-700 */
+        }
+        .form-radio {
+            color: #4f46e5;
+        }
+        .custom-input {
+            display: none;
+        }
+        .output-box {
+            background-color: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 150px;
+        }
+        .loader {
+            border: 4px solid #4b5563;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Sidebar specific styles */
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: #d1d5db; /* text-gray-300 */
+            transition: background-color 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .sidebar-link:hover {
+            background-color: #374151; /* bg-gray-700 */
+            color: #ffffff;
+        }
+        .sidebar-link.active {
+            background-color: #4f46e5; /* bg-indigo-600 */
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .sidebar-link svg {
+            margin-right: 0.75rem;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="flex h-screen bg-gray-900">
+        <!-- Sidebar -->
+        <aside class="w-64 flex-shrink-0 bg-gray-800 p-4 flex flex-col justify-between">
+            <div>
+                <!-- Logo -->
+                <div class="flex items-center mb-8">
+                    <div class="bg-indigo-600 p-2 rounded-lg mr-3">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h1 class="text-xl font-bold text-white">ThreadCEU AI</h1>
+                </div>
+
+                <!-- Navigation -->
+                <nav>
+                    <ul id="sidebar-nav">
+                        <li>
+                            <a id="nav-generator" class="sidebar-link active">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
+                                <span>Generator</span>
+                            </a>
+                        </li>
+                        <li class="mt-2">
+                            <a id="nav-hook" class="sidebar-link">
+                               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
+                                <span>Inspirasi Hook</span>
+                            </a>
+                        </li>
+                        <li class="mt-2">
+                            <a class="sidebar-link opacity-50 cursor-not-allowed">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                <span>Pengaturan (Segera)</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <!-- Footer Sidebar -->
+            <div class="text-center text-gray-500 text-sm">
+                 <a href="https://lynk.id/ceuceuai" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-400 transition-colors">
+                    Developed with ❤️ by Ceuceu AI
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+            <!-- Page: Thread Generator -->
+            <div id="page-generator" class="page-content">
+                <div class="container mx-auto max-w-4xl">
+                    <header class="text-left mb-8">
+                        <h1 class="text-4xl font-bold text-white">Thread Generator</h1>
+                        <p class="text-lg text-gray-400 mt-2">Mulai buat thread viral Anda dengan mengisi form di bawah.</p>
+                    </header>
+
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="tema" class="block text-sm font-medium text-gray-300 mb-2">1. Tema / Niche</label>
+                                <select id="tema" class="form-select w-full rounded-md">
+                                    <option>Pemasaran Digital</option>
+                                    <option>Teknologi & AI</option>
+                                    <option>Pengembangan Diri</option>
+                                    <option>Kesehatan & Kebugaran</option>
+                                    <option>Keuangan & Investasi</option>
+                                    <option>Startup & Bisnis</option>
+                                    <option value="custom">Lainnya (manual)...</option>
+                                </select>
+                                <input type="text" id="tema-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Masukkan niche Anda sendiri">
+                            </div>
+                            <div>
+                                <label for="gaya" class="block text-sm font-medium text-gray-300 mb-2">2. Gaya Bahasa</label>
+                                <select id="gaya" class="form-select w-full rounded-md">
+                                    <option>Humoris</option>
+                                    <option>Formal</option>
+                                    <option>Edukasi</option>
+                                    <option>Profesional</option>
+                                    <option>Inspiratif</option>
+                                    <option value="custom">Lainnya (manual)...</option>
+                                </select>
+                                <input type="text" id="gaya-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Contoh: Seperti teman cerita">
+                            </div>
+                            <div>
+                                <label for="topik-select" class="block text-sm font-medium text-gray-300 mb-2">3. Topik / Keyword</label>
+                                <select id="topik-select" class="form-select w-full rounded-md">
+                                    <option>Tips & Trik</option>
+                                    <option>Studi Kasus</option>
+                                    <option>Berita Terbaru</option>
+                                    <option value="custom">Lainnya (manual)...</option>
+                                </select>
+                                <input type="text" id="topik-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Masukkan topik spesifik Anda">
+                            </div>
+                            <div>
+                                <label for="jenis" class="block text-sm font-medium text-gray-300 mb-2">4. Panjang Thread</label>
+                                <select id="jenis" class="form-select w-full rounded-md">
+                                    <option value="1 post">1 Post (Sangat Pendek)</option>
+                                    <option value="3-5 post" selected>3-5 post (Seri Pendek)</option>
+                                    <option value="6-9 post">6-9 post (Seri Medium)</option>
+                                    <option value="10-15 post">10-15 post (Seri Panjang)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300">5. Rekomendasi Gambar</label>
+                                <fieldset class="mt-2">
+                                    <div class="flex items-center space-x-6">
+                                        <div class="flex items-center"><input id="gambar-ya" name="rekomendasi-gambar" type="radio" value="ya" checked class="form-radio h-4 w-4"><label for="gambar-ya" class="ml-2 block text-sm text-gray-300">Ya</label></div>
+                                        <div class="flex items-center"><input id="gambar-tidak" name="rekomendasi-gambar" type="radio" value="tidak" class="form-radio h-4 w-4"><label for="gambar-tidak" class="ml-2 block text-sm text-gray-300">Tidak</label></div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div>
+                                <label for="cta-select" class="block text-sm font-medium text-gray-300 mb-2">6. Pilih CTA (Call to Action)</label>
+                                <select id="cta-select" class="form-select w-full rounded-md">
+                                    <option>Ajak komen</option>
+                                    <option>Ajak save / share</option>
+                                    <option>Ajak follow</option>
+                                    <option>Tidak perlu</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-8 text-center"><button id="generate-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all duration-300 w-full md:w-auto">✨ Generate Konten</button></div>
+                    </div>
+                    <div id="output-section" class="hidden">
+                         <div id="loader" class="flex justify-center items-center my-8 hidden"><div class="loader"></div><p class="ml-4 text-gray-400">AI sedang meracik konten...</p></div>
+                        <div id="results" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <h2 class="text-2xl font-semibold mb-4 text-white flex items-center"><svg class="w-6 h-6 mr-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span>1. Hasil Konten Thread</span></h2>
+                                <div id="thread-output" class="output-box"><p class="text-gray-400">Hasil konten thread akan muncul di sini...</p></div>
+                                <div class="mt-4 flex space-x-2"><button id="copy-thread-btn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">Salin</button><button id="save-thread-txt-btn" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan .TXT</button></div>
+                            </div>
+                            <div id="prompt-output-container">
+                                <h2 class="text-2xl font-semibold mb-4 text-white flex items-center"><svg class="w-6 h-6 mr-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span>2. Hasil Prompt Visual</span></h2>
+                                <div id="prompt-output" class="output-box"><p class="text-gray-400">Prompt untuk AI Image akan muncul di sini...</p></div>
+                                <div class="mt-4 flex space-x-2"><button id="copy-prompt-btn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">Salin</button><button id="save-prompt-txt-btn" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan .TXT</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Inspirasi Hook -->
+            <div id="page-hook" class="page-content hidden">
+                 <div class="container mx-auto max-w-4xl">
+                    <header class="text-left mb-8">
+                        <h1 class="text-4xl font-bold text-white">Inspirasi Hook</h1>
+                        <p class="text-lg text-gray-400 mt-2">Dapatkan 20 ide hook (kalimat pembuka) terbaik untuk konten Anda.</p>
+                    </header>
+
+                     <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="hook-tema-select" class="block text-sm font-medium text-gray-300 mb-2">Pilih Tema Hook</label>
+                                <select id="hook-tema-select" class="form-select w-full rounded-md">
+                                    <option>Galau</option>
+                                    <option>Humor</option>
+                                    <option>Data/Fakta</option>
+                                    <option>Pop Culture</option>
+                                    <option value="custom">Lainnya (manual)...</option>
+                                </select>
+                                <input type="text" id="hook-tema-custom" class="form-input w-full rounded-md mt-2 custom-input" placeholder="Masukkan tema hook Anda sendiri">
+                            </div>
+                        </div>
+                        <div class="mt-8 text-center"><button id="generate-hook-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all duration-300 w-full md:w-auto">🚀 Generate 20 Hook</button></div>
+                    </div>
+
+                    <div id="hook-output-section" class="hidden">
+                         <div id="hook-loader" class="flex justify-center items-center my-8 hidden"><div class="loader"></div><p class="ml-4 text-gray-400">AI sedang mencari inspirasi...</p></div>
+                        <div id="hook-results">
+                            <h2 class="text-2xl font-semibold mb-4 text-white flex items-center"><svg class="w-6 h-6 mr-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span>20 Hook Terbaik Untukmu</span></h2>
+                            <div id="hook-output" class="output-box"><p class="text-gray-400">Daftar hook akan muncul di sini...</p></div>
+                            <div class="mt-4 flex space-x-2"><button id="copy-hook-btn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">Salin</button><button id="save-hook-txt-btn" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">Simpan .TXT</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- PAGE NAVIGATION ---
+        const navLinks = document.querySelectorAll('.sidebar-link');
+        const pages = document.querySelectorAll('.page-content');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (link.classList.contains('opacity-50')) return;
+
+                const targetPageId = 'page-' + link.id.split('-')[1];
+                
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                link.classList.add('active');
+
+                pages.forEach(page => {
+                    if (page.id === targetPageId) {
+                        page.classList.remove('hidden');
+                    } else {
+                        page.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+
+        // --- THREAD GENERATOR LOGIC ---
+        const temaSelect = document.getElementById('tema');
+        const temaCustomInput = document.getElementById('tema-custom');
+        const gayaSelect = document.getElementById('gaya');
+        const gayaCustomInput = document.getElementById('gaya-custom');
+        const topikSelect = document.getElementById('topik-select');
+        const topikCustomInput = document.getElementById('topik-custom');
+        const jenisSelect = document.getElementById('jenis');
+        const ctaSelect = document.getElementById('cta-select');
+        const gambarRadioButtons = document.querySelectorAll('input[name="rekomendasi-gambar"]');
+        const generateBtn = document.getElementById('generate-btn');
+        const outputSection = document.getElementById('output-section');
+        const loader = document.getElementById('loader');
+        const results = document.getElementById('results');
+        const threadOutput = document.getElementById('thread-output');
+        const promptOutputContainer = document.getElementById('prompt-output-container');
+        const promptOutput = document.getElementById('prompt-output');
+        const copyThreadBtn = document.getElementById('copy-thread-btn');
+        const copyPromptBtn = document.getElementById('copy-prompt-btn');
+        const saveThreadTxtBtn = document.getElementById('save-thread-txt-btn');
+        const savePromptTxtBtn = document.getElementById('save-prompt-txt-btn');
+
+        temaSelect.addEventListener('change', () => temaCustomInput.style.display = temaSelect.value === 'custom' ? 'block' : 'none');
+        gayaSelect.addEventListener('change', () => gayaCustomInput.style.display = gayaSelect.value === 'custom' ? 'block' : 'none');
+        topikSelect.addEventListener('change', () => topikCustomInput.style.display = topikSelect.value === 'custom' ? 'block' : 'none');
+        generateBtn.addEventListener('click', generateContent);
+        copyThreadBtn.addEventListener('click', () => copyToClipboard(threadOutput.innerText, copyThreadBtn));
+        copyPromptBtn.addEventListener('click', () => copyToClipboard(promptOutput.innerText, copyPromptBtn));
+        saveThreadTxtBtn.addEventListener('click', () => saveAsTxt(threadOutput.innerText, 'thread-ceu-ai.txt'));
+        savePromptTxtBtn.addEventListener('click', () => saveAsTxt(promptOutput.innerText, 'prompt-visual-ceu-ai.txt'));
+        gambarRadioButtons.forEach(radio => {
+            radio.addEventListener('change', () => {
+                const showPrompt = document.querySelector('input[name="rekomendasi-gambar"]:checked').value === 'ya';
+                promptOutputContainer.style.display = showPrompt ? 'block' : 'none';
+            });
+        });
+        
+        async function generateContent() {
+            const tema = temaSelect.value === 'custom' ? temaCustomInput.value : temaSelect.value;
+            const gaya = gayaSelect.value === 'custom' ? gayaCustomInput.value : gayaSelect.value;
+            const topik = topikSelect.value === 'custom' ? topikCustomInput.value : topikSelect.value;
+            const jenis = jenisSelect.value;
+            const rekomendasiGambar = document.querySelector('input[name="rekomendasi-gambar"]:checked').value;
+            const cta = ctaSelect.value;
+
+            if (!topik.trim() || (topikSelect.value === 'custom' && !topikCustomInput.value.trim())) {
+                alert('Harap isi atau pilih Topik / Keyword terlebih dahulu.');
+                return;
+            }
+
+            outputSection.classList.remove('hidden');
+            results.classList.add('hidden');
+            loader.classList.remove('hidden');
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Memproses...';
+
+            let finalPrompt = `
+                Anda adalah asisten pembuat konten media sosial ahli bernama ThreadCEU AI.
+                Tugas Anda adalah membuat output berdasarkan input pengguna.
+
+                Berikut adalah detail dari pengguna:
+                - Tema / Niche: ${tema}
+                - Gaya Bahasa: ${gaya}
+                - Topik / Keyword: ${topik}
+                - Panjang Thread: ${jenis}
+                - Call to Action (CTA): ${cta}
+                - Perlu Rekomendasi Gambar?: ${rekomendasiGambar}
+
+                Instruksi untuk Konten Thread:
+                - Buat thread yang koheren, menarik, dan sesuai dengan gaya bahasa yang diminta dalam Bahasa Indonesia.
+                - Beri nomor pada setiap postingan dengan format (contoh: 1/${jenis.split('-')[1] || 1}).
+                - PENTING: Pastikan ada satu baris kosong (jarak) di antara setiap post untuk keterbacaan yang lebih baik.
+                - Di akhir thread, sebelum hashtag, tambahkan kalimat ajakan bertindak yang sesuai dengan CTA yang dipilih ("${cta}"). Jika CTA adalah "Tidak perlu", jangan tambahkan kalimat ajakan apapun.
+                - Sertakan 3-4 hashtag yang relevan dan spesifik di akhir thread.
+                - Pastikan jumlah postingan sesuai dengan panjang yang diminta.
+            `;
+
+            if (rekomendasiGambar === 'ya') {
+                finalPrompt += `
+                Instruksi untuk Prompt Visual:
+                - Buat prompt dalam BAHASA INGGRIS.
+                - Prompt harus deskriptif, detail, dan relevan dengan topik thread.
+                - Sertakan detail tentang gaya visual (misal: photorealistic, vector illustration), pencahayaan, warna, dan komposisi.
+
+                Format output Anda HARUS seperti ini, tanpa teks tambahan di awal atau akhir:
+                [KONTEN THREAD DI SINI]
+                ---PROMPT_VISUAL---
+                [PROMPT VISUAL DALAM BAHASA INGGRIS DI SINI]
+                `;
+            } else {
+                finalPrompt += `
+                Format output Anda HARUS hanya berisi konten thread, tanpa pembatas atau prompt visual.
+                `;
+            }
+
+            try {
+                const text = await callGeminiAPI(finalPrompt);
+                displayResults(text);
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                threadOutput.innerHTML = `<p class="text-red-400">Terjadi kesalahan saat menghubungi AI. Silakan coba lagi nanti. Error: ${error.message}</p>`;
+                promptOutput.innerHTML = `<p class="text-red-400">Gagal memuat prompt.</p>`;
+            } finally {
+                loader.classList.add('hidden');
+                results.classList.remove('hidden');
+                generateBtn.disabled = false;
+                generateBtn.textContent = '✨ Generate Konten';
+            }
+        }
+
+        function displayResults(responseText) {
+            const rekomendasiGambar = document.querySelector('input[name="rekomendasi-gambar"]:checked').value;
+            
+            if (rekomendasiGambar === 'ya' && responseText.includes('---PROMPT_VISUAL---')) {
+                const parts = responseText.split('---PROMPT_VISUAL---');
+                threadOutput.innerText = parts[0] ? parts[0].trim() : "Gagal memuat konten thread.";
+                promptOutput.innerText = parts[1] ? parts[1].trim() : "Gagal memuat prompt visual.";
+                promptOutputContainer.style.display = 'block';
+            } else {
+                threadOutput.innerText = responseText.trim();
+                promptOutputContainer.style.display = 'none';
+            }
+        }
+        
+        // --- HOOK GENERATOR LOGIC ---
+        const hookTemaSelect = document.getElementById('hook-tema-select');
+        const hookTemaCustom = document.getElementById('hook-tema-custom');
+        const generateHookBtn = document.getElementById('generate-hook-btn');
+        const hookOutputSection = document.getElementById('hook-output-section');
+        const hookLoader = document.getElementById('hook-loader');
+        const hookResults = document.getElementById('hook-results');
+        const hookOutput = document.getElementById('hook-output');
+        const copyHookBtn = document.getElementById('copy-hook-btn');
+        const saveHookTxtBtn = document.getElementById('save-hook-txt-btn');
+
+        hookTemaSelect.addEventListener('change', () => hookTemaCustom.style.display = hookTemaSelect.value === 'custom' ? 'block' : 'none');
+        generateHookBtn.addEventListener('click', generateHooks);
+        copyHookBtn.addEventListener('click', () => copyToClipboard(hookOutput.innerText, copyHookBtn));
+        saveHookTxtBtn.addEventListener('click', () => saveAsTxt(hookOutput.innerText, 'inspirasi-hook-ceu-ai.txt'));
+
+        async function generateHooks() {
+            const tema = hookTemaSelect.value === 'custom' ? hookTemaCustom.value : hookTemaSelect.value;
+            if (!tema.trim()) {
+                alert('Harap isi atau pilih Tema Hook terlebih dahulu.');
+                return;
+            }
+
+            hookOutputSection.classList.remove('hidden');
+            hookResults.classList.add('hidden');
+            hookLoader.classList.remove('hidden');
+            generateHookBtn.disabled = true;
+            generateHookBtn.textContent = 'Mencari Inspirasi...';
+
+            const finalPrompt = `
+                Anda adalah seorang copywriter media sosial yang sangat kreatif dan ahli dalam membuat kalimat pembuka (hook) yang viral.
+                Tugas Anda adalah membuat daftar 20 hook yang menarik untuk konten media sosial berdasarkan tema yang diberikan.
+
+                Tema: "${tema}"
+
+                Instruksi:
+                - Buat 20 hook yang unik, singkat, dan memancing rasa penasaran.
+                - Sesuaikan gaya hook dengan tema yang diberikan.
+                - Format hasilnya sebagai daftar bernomor (1. , 2. , dst.).
+                - Jangan menambahkan teks atau penjelasan lain selain daftar hook tersebut.
+            `;
+            
+            try {
+                const text = await callGeminiAPI(finalPrompt);
+                hookOutput.innerText = text.trim();
+            } catch (error) {
+                 console.error("Error calling Gemini API for hooks:", error);
+                hookOutput.innerHTML = `<p class="text-red-400">Terjadi kesalahan saat mencari inspirasi. Silakan coba lagi. Error: ${error.message}</p>`;
+            } finally {
+                hookLoader.classList.add('hidden');
+                hookResults.classList.remove('hidden');
+                generateHookBtn.disabled = false;
+                generateHookBtn.textContent = '🚀 Generate 20 Hook';
+            }
+        }
+
+        // --- UTILITY FUNCTIONS ---
+        async function callGeminiAPI(prompt) {
+            let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Handled by environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+            const result = await response.json();
+            
+            if (result.candidates && result.candidates[0]?.content?.parts[0]?.text) {
+                return result.candidates[0].content.parts[0].text;
+            } else {
+               throw new Error("Struktur respons dari AI tidak valid atau kosong.");
+            }
+        }
+
+        function copyToClipboard(text, button) {
+            if (!text || text.includes('akan muncul di sini...')) {
+                alert('Tidak ada konten untuk disalin.');
+                return;
+            }
+            const originalText = button.innerText;
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                button.innerText = 'Berhasil Disalin!';
+                button.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+                button.classList.add('bg-blue-600');
+                setTimeout(() => {
+                    button.innerText = originalText;
+                    button.classList.remove('bg-blue-600');
+                    button.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                }, 2000);
+            } catch (err) {
+                console.error('Gagal menyalin teks: ', err);
+                alert('Gagal menyalin teks.');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function saveAsTxt(content, filename) {
+            if (!content || content.includes('akan muncul di sini...')) {
+                alert('Tidak ada konten untuk disimpan.');
+                return;
+            }
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+    </script>
+</body>
+</html>
